@@ -35,7 +35,7 @@ command_exists() {
 TEMPLATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Default workspace location
-DEFAULT_WORKSPACE="$HOME/start"
+DEFAULT_WORKSPACE="$HOME/marvin"
 
 print_header "MARVIN Setup"
 echo "Welcome! Let's set up your personal AI Chief of Staff."
@@ -92,3 +92,35 @@ if ! command_exists git; then
 else
     print_color "$GREEN" "Git: installed"
 fi
+
+# ============================================================================
+# PHASE 2: Define Workspace Location
+# ============================================================================
+
+print_header "Phase 2: Workspace Location"
+
+echo "Where would you like your MARVIN workspace?"
+echo "This is where your data, goals, and session logs will live."
+echo ""
+echo "Default: $DEFAULT_WORKSPACE"
+read -p "Press Enter for default, or type a path: " WORKSPACE_INPUT
+
+if [[ -z "$WORKSPACE_INPUT" ]]; then
+    WORKSPACE_DIR="$DEFAULT_WORKSPACE"
+else
+    # Expand ~ if present
+    WORKSPACE_DIR="${WORKSPACE_INPUT/#\~/$HOME}"
+fi
+
+# Check if workspace already exists
+if [[ -d "$WORKSPACE_DIR" ]]; then
+    print_color "$YELLOW" "Warning: $WORKSPACE_DIR already exists."
+    read -p "Continue and merge with existing? [y/N]: " CONTINUE_MERGE
+    if [[ ! "$CONTINUE_MERGE" =~ ^[Yy]$ ]]; then
+        print_color "$RED" "Setup cancelled."
+        exit 1
+    fi
+fi
+
+print_color "$GREEN" "Workspace: $WORKSPACE_DIR"
+
